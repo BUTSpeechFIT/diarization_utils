@@ -43,8 +43,7 @@ def hard_labels_to_rttm(
             for pos in range(beg.shape[0]):
                 time_beg = beg[pos] / precision
                 time_length = (end[pos] - beg[pos]) / precision
-                changes_dict[(time_beg, s)] = f"SPEAKER {utt_id} 1 {time_beg} \
-                        {time_length} <NA> <NA> {spk_labels[s]} <NA> <NA>\n"
+                changes_dict[(time_beg, s)] = f"SPEAKER {utt_id} 1 {time_beg} {time_length} <NA> <NA> {spk_labels[s]} <NA> <NA>\n"
     changes_dict = OrderedDict(sorted(changes_dict.items()))
     if not os.path.exists(os.path.dirname(rttm_path)):
         os.makedirs(os.path.dirname(rttm_path))
