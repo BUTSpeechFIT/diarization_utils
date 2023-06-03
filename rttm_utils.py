@@ -82,18 +82,22 @@ def rttm_to_hard_labels(
         spks = np.asarray([spks])
     # length of the file (s) that can be recovered from the rttm,
     # there might be extra silence at the end
-    len_file = data[-1][0]+data[-1][1]
+    if len(data) == 0:
+        len_file = 0
+    else:
+        len_file = data[-1][0]+data[-1][1]
     if length > len_file:
         len_file = length
 
     # matrix in given precision
     matrix = np.zeros([int(round(len_file*precision)), Ns])
-    # ranges to mark each turn
-    ranges = np.around((np.array([data[:, 0],
-                        data[:, 0]+data[:, 1]]).T*precision)).astype(int)
+    if len(data) > 0:
+        # ranges to mark each turn
+        ranges = np.around((np.array([data[:, 0],
+                            data[:, 0]+data[:, 1]]).T*precision)).astype(int)
 
-    for s in range(Ns):  # loop over speakers
-        # loop all the turns of the speaker
-        for init_end in ranges[spks == spk_ids[s], :]:
-            matrix[init_end[0]:init_end[1], s] = 1  # mark the spk
+        for s in range(Ns):  # loop over speakers
+            # loop all the turns of the speaker
+            for init_end in ranges[spks == spk_ids[s], :]:
+                matrix[init_end[0]:init_end[1], s] = 1  # mark the spk
     return matrix, spk_ids
