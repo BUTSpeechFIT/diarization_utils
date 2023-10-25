@@ -4,6 +4,7 @@
 # Licensed under the Apache License, Version 2.0 (the "License")
 
 from collections import OrderedDict
+from typing import List, Tuple
 import numpy as np
 import os
 
@@ -60,3 +61,55 @@ def hard_labels_to_lab(
     with open(lab_path, 'w') as f:
         for k, v in changes_dict.items():
             f.write(v)
+
+
+def lab_to_hard_labels(
+    lab_path: str,
+    precision: float,
+    overlap: bool,
+    length: float = -1
+) -> Tuple[np.ndarray, List[str]]:
+    """
+        reads the lab and returns a Nfx1 matrix encoding the segments in
+        which each speaker is present (labels 1/0) at the given precision.
+        Nf is the resulting number of frames,
+        according to the parameters given.
+        Nf might be shorter than the real length of the utterance, as final
+        silence parts cannot be recovered from the rttm.
+        If length is defined (s), it is to account for that extra silence.
+        The function assumes that the lab only contains speaker turns (no
+        silence segments).
+    """
+    # each row is a turn, columns denote beginning (s) and duration (s) of turn
+    data = np.loadtxt(lab_path, usecols=[0, 1])
+    if data.shape[0] == 2 and len(data.shape) < 2:  # if only one segment
+        data = np.asarray([data])
+    # length of the file (s) that can be recovered from the lab,
+    # there might be extra silence at the end
+    if len(data) == 0:
+        len_file = 0
+    else:
+        len_file = data[-1][0]+data[-1][1]
+    if length > len_file:
+        len_file = length
+
+    # matrix in given precision
+    if overlap:
+        matrix = np.zeros([int(round(len_file*precision)), 2])
+    else:
+        matrix = np.zeros([int(round(len_file*precision)), 1])
+    if len(data) > 0:
+        # ranges to mark each turn
+        ranges = np.around((np.array([data[:, 0],
+                            data[:, 1]]).T*precision)).astype(int)
+
+        for init_end in ranges: # loop over turns
+            matrix[init_end[0]:init_end[1], 0] = 1  # mark the frame
+            if overlap:
+                matrix[init_end[0]:init_end[1], 1] = 1  # mark the frame
+
+    if overlap:
+        labels = ['speech1', 'speech2']
+    else:
+        labels = ['speech']
+    return matrix, labels

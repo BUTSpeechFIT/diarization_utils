@@ -51,7 +51,11 @@ def main():
             counts_dict[(ref_qty, sys_qty)] = 1
 
     with open(args.out_file, 'w') as f:
-        f.write("Ref/Sys".ljust(10) + "0".ljust(4) + "1".ljust(4) + "2".ljust(4) + "3".ljust(4) + "4".ljust(4) + "5".ljust(4) + "6".ljust(4) + "7".ljust(4) + "8".ljust(4) + "9".ljust(4) + "10".ljust(4) + "\n")
+        header_str = "Ref/Sys".ljust(10)
+        for i in range(0, args.max_num_speakers + 1):
+            header_str += str(i).ljust(4)
+        header_str += "\n"
+        f.write(header_str)
         for ref in range(0, args.max_num_speakers + 1):
             f.write(str(ref).ljust(10))
             for sys in range(0, args.max_num_speakers + 1):

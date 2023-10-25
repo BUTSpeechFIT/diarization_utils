@@ -47,7 +47,7 @@ def main():
     lengths_4spk = []
 
     with open(args.out_file, 'w') as f:
-        f.write('Name'.ljust(16)+'Silence (s)'.ljust(18) +
+        f.write('Name'.ljust(50)+'Silence (s)'.ljust(18) +
                 'mean'.ljust(9)+'std'.ljust(13) +
                 '1 speaker (s)'.ljust(18)+'mean'.ljust(9)+'std'.ljust(13) +
                 '2 speakers (s)'.ljust(18)+'mean'.ljust(9)+'std'.ljust(13) +
@@ -100,7 +100,7 @@ def main():
             lengths_3spk.extend(segments_3spk)
             lengths_4spk.extend(segments_4spk)
 
-            f.write(key.ljust(16) + (str(seconds_sil)).ljust(9) +
+            f.write(key.ljust(50) + (str(seconds_sil)).ljust(9) +
                 ('('+str(round(100*(seconds_sil/seconds), 2))+'%)').ljust(9) +
                 (str(round(mean_sil, 2))).ljust(9) +
                 (str(round(std_sil, 2))).ljust(13) +
@@ -120,7 +120,7 @@ def main():
                 ('('+str(round(100*(seconds_4spk/seconds), 2))+'%)').ljust(9) +
                 (str(round(mean_4spk, 2))).ljust(9) +
                 (str(round(std_4spk, 2))).ljust(13)+'\n')
-        f.write('ALL'.ljust(16) + (str(all_sil)).ljust(9) +
+        f.write('ALL'.ljust(50) + (str(all_sil)).ljust(9) +
                 ('('+str(round(100*(all_sil/all_seconds), 2))+'%)').ljust(9) +
                 (str(round(np.mean(lengths_sil), 2))).ljust(9) +
                 (str(round(np.std(lengths_sil), 2))).ljust(13) +
