@@ -52,6 +52,7 @@ if __name__ == '__main__':
         f.write('----------------------------------------------------------------------------------------------------\n')
         
         for name in files_list:
+            print(name)
             ref_matrix, _ = rttm_to_hard_labels(
                 os.path.join(args.rttm_ref_dir, f"{name}.rttm"),
                 1000,
@@ -60,6 +61,8 @@ if __name__ == '__main__':
                 os.path.join(args.rttm_sys_dir, f"{name}.rttm"),
                 1000,
                 lengths[name])
+            ref_matrix = ref_matrix[:min(ref_matrix.shape[0], sys_matrix.shape[0]),:]
+            sys_matrix = sys_matrix[:min(ref_matrix.shape[0], sys_matrix.shape[0]),:]
 
             ref_matrix = ref_matrix.max(axis=1)
             sys_matrix = sys_matrix.max(axis=1)

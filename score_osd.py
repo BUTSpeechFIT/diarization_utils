@@ -60,6 +60,9 @@ if __name__ == '__main__':
                 os.path.join(args.rttm_sys_dir, f"{name}.rttm"),
                 1000,
                 lengths[name])
+            ref_matrix = ref_matrix[:min(ref_matrix.shape[0], sys_matrix.shape[0]),:]
+            sys_matrix = sys_matrix[:min(ref_matrix.shape[0], sys_matrix.shape[0]),:]
+
 
             ref_matrix = (ref_matrix.sum(axis=1) > 1).astype(int)
             sys_matrix = (sys_matrix.sum(axis=1) > 1).astype(int)
