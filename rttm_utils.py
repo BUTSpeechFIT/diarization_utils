@@ -76,7 +76,7 @@ def rttm_to_hard_labels(
     # speaker id of each turn
     spks = np.loadtxt(rttm_path, usecols=[7], dtype='str')
     spk_ids = np.unique(spks)
-    Ns = len(spk_ids)
+    Ns = max(len(spk_ids), 1) # make at least 1-dim matrix
     if data.shape[0] == 2 and len(data.shape) < 2:  # if only one segment
         data = np.asarray([data])
         spks = np.asarray([spks])
