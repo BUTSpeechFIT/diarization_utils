@@ -20,8 +20,12 @@ def parse_arguments() -> SimpleNamespace:
                         help='output file where results are written')
     parser.add_argument('--precision', type=float, required=False, default=1000.0,
                         help='precision used to interpret annotations')
+    parser.add_argument('--lengths', type=str, required=True,
+                        help='file containing list of lengths per file')
     parser.add_argument('--txt-list', type=str, required=True,
                         help='list of files to process')
+    parser.add_argument('--uem-file', type=str, required=False,
+                        help='optional uem segments')
     args = parser.parse_args()
     return args
 
@@ -32,6 +36,19 @@ def main():
     list = [line.rstrip() for line in open(args.txt_list, 'r')]
     if not os.path.exists(os.path.dirname(args.out_file)):
         os.makedirs(os.path.dirname(args.out_file))
+    lengths_list = np.loadtxt(args.lengths, dtype=object)
+    lengths = {}
+    for line in lengths_list:
+        name, length = line
+        lengths[name] = float(length)
+    if args.uem_file is not None:
+        uem_list = np.loadtxt(args.uem_file, dtype=object)
+        uem_info = {}
+        for line in uem_list:
+            if line[0] in uem_info.keys():
+                uem_info[line[0]].append((float(line[2]), float(line[3])))
+            else:
+                uem_info[line[0]] = [(float(line[2]), float(line[3]))]
 
     all_sil = 0.0
     all_1spk = 0.0
@@ -55,8 +72,16 @@ def main():
                 '>3 speakers (s)'.ljust(18)+'mean'.ljust(9)+'std'.ljust(13)+'\n')
         for line in list:
             key = line
-            matrix, spk_labels = rttm_to_hard_labels(
-                args.in_rttm_dir+'/'+key+'.rttm', args.precision)
+            matrix, _ = rttm_to_hard_labels(
+                args.in_rttm_dir+'/'+key+'.rttm', args.precision, lengths[key])
+            if args.uem_file is not None:
+                # Create corresponding mask
+                mask = np.zeros(matrix.shape[0], dtype=int)
+                for seg in uem_info[key]:
+                    beg = int(seg[0]*args.precision)
+                    end = int(seg[1]*args.precision)
+                    mask[beg:end] = 1
+                matrix = matrix[mask == 1,:]
             classes = np.sum(matrix, axis=1)
 
             seconds_sil = len(np.where(classes == 0)[0]) / args.precision
