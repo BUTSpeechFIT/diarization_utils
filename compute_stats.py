@@ -56,6 +56,7 @@ def main():
     all_3spk = 0.0
     all_4spk = 0.0
     all_seconds = 0.0
+    all_vad_seconds = 0.0
 
     lengths_sil = []
     lengths_1spk = []
@@ -90,6 +91,7 @@ def main():
             seconds_3spk = len(np.where(classes == 3)[0]) / args.precision
             seconds_4spk = len(np.where(classes >= 4)[0]) / args.precision
             seconds = seconds_sil + seconds_1spk + seconds_2spk + seconds_3spk + seconds_4spk
+            vad_seconds = seconds - seconds_sil
 
             all_sil += seconds_sil
             all_1spk += seconds_1spk
@@ -97,6 +99,7 @@ def main():
             all_3spk += seconds_3spk
             all_4spk += seconds_4spk
             all_seconds += seconds
+            all_vad_seconds += vad_seconds
 
             changes_positions = np.concatenate(([0], np.where(classes[:-1] != classes[1:])[0]+1, [len(classes)]))
             segment_type = classes[changes_positions[:-1]]
@@ -130,19 +133,19 @@ def main():
                 (str(round(mean_sil, 2))).ljust(9) +
                 (str(round(std_sil, 2))).ljust(13) +
                 (str(seconds_1spk)).ljust(9) +
-                ('('+str(round(100*(seconds_1spk/seconds), 2))+'%)').ljust(9) +
+                ('('+str(round(100*(seconds_1spk/vad_seconds), 2))+'%)').ljust(9) +
                 (str(round(mean_1spk, 2))).ljust(9) +
                 (str(round(std_1spk, 2))).ljust(13) +
                 (str(seconds_2spk)).ljust(9) +
-                ('('+str(round(100*(seconds_2spk/seconds), 2))+'%)').ljust(9) +
+                ('('+str(round(100*(seconds_2spk/vad_seconds), 2))+'%)').ljust(9) +
                 (str(round(mean_2spk, 2))).ljust(9) +
                 (str(round(std_2spk, 2))).ljust(13) +
                 (str(seconds_3spk)).ljust(9) +
-                ('('+str(round(100*(seconds_3spk/seconds), 2))+'%)').ljust(9) +
+                ('('+str(round(100*(seconds_3spk/vad_seconds), 2))+'%)').ljust(9) +
                 (str(round(mean_3spk, 2))).ljust(9) +
                 (str(round(std_3spk, 2))).ljust(13) +
                 (str(seconds_4spk)).ljust(9) +
-                ('('+str(round(100*(seconds_4spk/seconds), 2))+'%)').ljust(9) +
+                ('('+str(round(100*(seconds_4spk/vad_seconds), 2))+'%)').ljust(9) +
                 (str(round(mean_4spk, 2))).ljust(9) +
                 (str(round(std_4spk, 2))).ljust(13)+'\n')
         f.write('ALL'.ljust(50) + (str(all_sil)).ljust(9) +
@@ -150,19 +153,19 @@ def main():
                 (str(round(np.mean(lengths_sil), 2))).ljust(9) +
                 (str(round(np.std(lengths_sil), 2))).ljust(13) +
                 (str(all_1spk)).ljust(9) +
-                ('('+str(round(100*(all_1spk/all_seconds), 2))+'%)').ljust(9) +
+                ('('+str(round(100*(all_1spk/all_vad_seconds), 2))+'%)').ljust(9) +
                 (str(round(np.mean(lengths_1spk), 2))).ljust(9) +
                 (str(round(np.std(lengths_1spk), 2))).ljust(13) +
                 (str(all_2spk)).ljust(9) +
-                ('('+str(round(100*(all_2spk/all_seconds), 2))+'%)').ljust(9) +
+                ('('+str(round(100*(all_2spk/all_vad_seconds), 2))+'%)').ljust(9) +
                 (str(round(np.mean(lengths_2spk), 2))).ljust(9) +
                 (str(round(np.std(lengths_2spk), 2))).ljust(13) +
                 (str(all_3spk)).ljust(9) +
-                ('('+str(round(100*(all_3spk/all_seconds), 2))+'%)').ljust(9) +
+                ('('+str(round(100*(all_3spk/all_vad_seconds), 2))+'%)').ljust(9) +
                 (str(round(np.mean(lengths_3spk), 2))).ljust(9) +
                 (str(round(np.std(lengths_3spk), 2))).ljust(13) +
                 (str(all_4spk)).ljust(9) +
-                ('('+str(round(100*(all_4spk/all_seconds), 2))+'%)').ljust(9) +
+                ('('+str(round(100*(all_4spk/all_vad_seconds), 2))+'%)').ljust(9) +
                 (str(round(np.mean(lengths_4spk), 2))).ljust(9) +
                 (str(round(np.std(lengths_4spk), 2))).ljust(13) + '\n')
 
